@@ -2,7 +2,7 @@
 using HOCGadgetShopApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 
 namespace HOCGadgetShopApi.Controllers
@@ -18,7 +18,7 @@ namespace HOCGadgetShopApi.Controllers
             SqlConnection connection = new SqlConnection
             {
 
-                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true"
+                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
 
             };
             SqlCommand command = new SqlCommand { 
@@ -45,7 +45,7 @@ namespace HOCGadgetShopApi.Controllers
             SqlConnection connection = new SqlConnection
             {
 
-                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true"
+                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
 
             };
             SqlCommand command = new SqlCommand
@@ -76,6 +76,60 @@ namespace HOCGadgetShopApi.Controllers
 
             connection.Close();
             return Ok(JsonConvert.SerializeObject(value: response));
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteInventoryData(int ProductId)
+        {
+            SqlConnection connection = new SqlConnection
+            {
+
+                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
+
+            };
+            SqlCommand command = new SqlCommand
+            {
+                CommandText = "SP_DeleteInventoryDetails",
+                CommandType = System.Data.CommandType.StoredProcedure,
+                Connection = connection
+            };
+
+            command.Parameters.AddWithValue("@ProductId", ProductId);
+
+            connection.Open();
+            command.ExecuteNonQuery();
+
+
+            connection.Close();
+            return Ok();
+        }
+        [HttpPut]
+        public IActionResult UpdateInventoryData(InventoryRequestDto requestDto)
+        {
+            SqlConnection connection = new SqlConnection
+            {
+
+                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
+
+            };
+            SqlCommand command = new SqlCommand
+            {
+                CommandText = "sp_UpdateInventoryData",
+                CommandType = System.Data.CommandType.StoredProcedure,
+                Connection = connection
+            };
+
+            command.Parameters.AddWithValue("@ProductId", requestDto.ProductId);
+            command.Parameters.AddWithValue("@ProductName", requestDto.ProductName);
+            command.Parameters.AddWithValue("@AvaliableStock", requestDto.AvaliableStock);
+            command.Parameters.AddWithValue("@ReorderPoint", requestDto.ReorderPoint);
+
+            connection.Open();
+            command.ExecuteNonQuery();
+
+
+            connection.Close();
+            return Ok();
         }
     }
 }

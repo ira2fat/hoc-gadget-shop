@@ -8,27 +8,20 @@
         type="text"
         class="form-control"
         placeholder="Product Id"
+        disabled={{disableProductIDInput}}
         name="productId" [(ngModel)]="inventoryData.productID"
-      />
-    </div>
-    <div class="col-md-2">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Product Name"
-        name="productName" [(ngModel)]="inventoryData.productName"
       />
     </div>
 
     <div class="col-md-3">
       <select
         class="form-select"
-        name="category"
+        name="productName" [(ngModel)]="inventoryData.productName"
       >
         <option value="">Choose...</option>
-        <option value="1">Earphones</option> 
-        <option value="2">Mobile </option> 
-        <option value="3">playstation</option> 
+        <option value="Earphones">Earphones</option>
+        <option value="Mobile">Mobile</option>
+        <option value="Playstation">Playstation</option>
       </select>
     </div>
 
@@ -78,10 +71,10 @@
         <td>{{ item.AvaliableStock }}</td>
         <td>{{ item.ReorderPoint }}</td>
         <td>
-          <button class="btn btn-sm btn-primary me-2" >
+          <button class="btn btn-sm btn-primary me-2" (click)="populateFormForEdit(item)" >
             Edit
           </button>
-          <button class="btn btn-sm btn-danger" >
+          <button class="btn btn-sm btn-danger" (click)="OpenConfirmDialog(item.ProductId)" >
             Delete
           </button>
         </td>

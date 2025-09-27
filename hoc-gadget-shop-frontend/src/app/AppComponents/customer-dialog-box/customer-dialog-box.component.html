@@ -1,0 +1,40 @@
+
+  <div class="modal-header">
+  <h5 class="modal-title" id="customerModalLabel">Customer</h5>
+  <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+</div>
+
+<div class="modal-body">
+  <form (ngSubmit)="addCustomer()">
+    <div class="row g-2 mb-3">
+      <div class="col">
+        <input type="text" class="form-control" placeholder="First name" name="firstName" [(ngModel)]="customerDetails.firstName"  >
+      </div>
+      <div class="col">
+        <input type="text" class="form-control" placeholder="Last name" name="lastName" [(ngModel)]="customerDetails.lastName" >
+      </div>
+    </div>
+    <div class="row g-2 mb-3">
+      <div class="col">
+        <input type="text" class="form-control" placeholder="Phone Number" name="phone" [(ngModel)]="customerDetails.phoneNumber" >
+      </div>
+      <div class="col">
+        <input type="date" class="form-control" placeholder="Registration Date" name="registrationDate" [(ngModel)]="customerDetails.registrationDate">
+      </div>
+    </div>
+    <div class="row g-2 mb-3">
+        <div class="col">
+      <input type="email" class="form-control" placeholder="Email" name="email" [(ngModel)]="customerDetails.email" >
+    </div>
+     <div class="col">
+      <input type="text" class="form-control" placeholder="CustomerId" name="CustomerId" [(ngModel)]="customerDetails.customerId">
+    </div>
+    </div>
+    
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" (click)="addCustomer()">Add</button>
+  <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+</div>

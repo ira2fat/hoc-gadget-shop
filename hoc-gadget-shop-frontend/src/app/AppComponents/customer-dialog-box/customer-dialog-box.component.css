@@ -1,0 +1,11 @@
+.modal-content {
+  margin: 0;              /* removes margin around */
+  padding: 0;             /* removes padding inside */
+}
+
+.modal-header,
+.modal-body,
+.modal-footer {
+  padding: 0.75rem 1rem;  /* tighter spacing */
+  margin: 0;              /* removes any default margin */
+}
