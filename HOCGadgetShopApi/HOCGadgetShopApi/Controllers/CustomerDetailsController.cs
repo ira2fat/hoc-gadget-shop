@@ -1,142 +1,157 @@
 ﻿using HOCGadgetShopApi.Models;
 using Microsoft.Data.SqlClient;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
+using System.Data;
+using HOCGadgetShopApi.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace HOCGadgetShopApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class CustomerDetailsController : ControllerBase
     {
-        [HttpPost]
-        public IActionResult SaveCustomerData(CustomerRequestDto requestDto)
+  
+        private readonly ILogger<CustomerDetailsController> _logger;
+        private readonly GadgetShopContext _context;
+        private readonly IMemoryCache _cache;
+
+
+        public CustomerDetailsController(IConfiguration configuration, ILogger<CustomerDetailsController> logger, GadgetShopContext context, IMemoryCache cache)
         {
-            Console.WriteLine(requestDto.RegistrationDate);
-            SqlConnection connection = new SqlConnection
+            _logger = logger;
+            _context = context;
+            _cache = cache;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveCustomerData([FromBody] CustomerRequestDto requestDto)
+        {
+            
+            try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var customerDetail= new CustomerDetails
+                {
+                    CustomerId = requestDto.CustomerId,
+                    FirstName = requestDto.FirstName,
+                    LastName = requestDto.LastName,
+                    Email = requestDto.Email,
+                    PhoneNumber = requestDto.PhoneNumber,
+                    RegistrationDate = requestDto.RegistrationDate
+                };
+                await _context.CustomerDetails.AddAsync(customerDetail);
+                await _context.SaveChangesAsync();
 
-                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
+                _cache.Remove("CustomerData");
 
-            };
-            SqlCommand command = new SqlCommand
+                return CreatedAtAction(nameof(GetCustomersData), new { id = customerDetail.CustomerId }, customerDetail);
+
+
+            }
+            catch (Exception ex)
             {
-                CommandText = "sp_SaveCustomerDetails",
-                CommandType = System.Data.CommandType.StoredProcedure,
-                Connection = connection
-            };
+                _logger.LogError(ex, "Error saving customer data");
 
-            command.Parameters.AddWithValue("@CustomerId", requestDto.CustomerId);
-            command.Parameters.AddWithValue("@FirstName", requestDto.FirstName);
-            command.Parameters.AddWithValue("@LastName", requestDto.LastName);
-            command.Parameters.AddWithValue("@Email", requestDto.Email);
-            command.Parameters.AddWithValue("@RegistrationDate", requestDto.RegistrationDate);
-            command.Parameters.AddWithValue("@PhoneNumber", requestDto.PhoneNumber);
-
-            connection.Open();
-            command.ExecuteNonQuery();
-
-            connection.Close();
-            return Ok();
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred.");
+            }
         }
 
         [HttpGet]
-        public IActionResult GetCustomersData()
+        public async Task<IActionResult> GetCustomersData()
         {
-            SqlConnection connection = new SqlConnection
+            
+            try
             {
+                const string cacheKey = "CustomerData";
 
-                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
-
-            };
-            SqlCommand command = new SqlCommand
-            {
-                CommandText = "sp_GetCustomersDetails",
-                CommandType = System.Data.CommandType.StoredProcedure,
-                Connection = connection
-            };
-
-            connection.Open();
-
-            List<CustomerDto> response = new List<CustomerDto>();
-
-            using (SqlDataReader reader = command.ExecuteReader())
-            {
-
-                while (reader.Read())
+                if (!_cache.TryGetValue(cacheKey, out List<CustomerDetails> cachedData))
                 {
-
-                    CustomerDto customerDto = new CustomerDto();
-
-                    customerDto.CustomerId = Convert.ToInt32(reader["CustomerId"]);
-                    customerDto.FirstName = Convert.ToString(reader["FirstName"]);
-                    customerDto.LastName = Convert.ToString(reader["LastName"]);
-                    customerDto.Email = Convert.ToString(reader["Email"]);
-                    customerDto.PhoneNumber = Convert.ToString(reader["PhoneNumber"]);
-                    customerDto.RegistrationDate = Convert.ToString(reader["RegistrationDate"]);
-                    response.Add(customerDto);
+                    cachedData = await _context.CustomerDetails.ToListAsync();
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromMinutes(5));
+                    _cache.Set(cacheKey, cachedData, cacheEntryOptions);
                 }
+                return Ok(cachedData);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error Getting customer data");
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred.");
             }
 
-            connection.Close();
-            return Ok(JsonConvert.SerializeObject(value: response));
         }
+
         [HttpPut]
-        public IActionResult UpdateCustomerData(CustomerRequestDto requestDto)
+        public async Task<IActionResult> UpdateCustomerData([FromBody] CustomerRequestDto requestDto)
         {
-            SqlConnection connection = new SqlConnection
+           
+
+            try
             {
 
-                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                var existingCustomer = await _context.CustomerDetails.FindAsync(requestDto.CustomerId);
+                if (existingCustomer == null)
+                {
+                    return NotFound($"Customer with ID {requestDto.CustomerId} not found.");
+                }
+                existingCustomer.FirstName = requestDto.FirstName;
+                existingCustomer.LastName = requestDto.LastName;
+                existingCustomer.Email = requestDto.Email;
+                existingCustomer.PhoneNumber = requestDto.PhoneNumber;
+                existingCustomer.RegistrationDate = requestDto.RegistrationDate;
 
-            };
-            SqlCommand command = new SqlCommand
+
+                _context.CustomerDetails.Update(existingCustomer);
+                await _context.SaveChangesAsync();
+
+                _cache.Remove("CustomerData");
+
+                return Ok();
+            }
+            catch (Exception ex)
             {
-                CommandText = "sp_UpdateCustomerDetails",
-                CommandType = System.Data.CommandType.StoredProcedure,
-                Connection = connection
-            };
+                _logger.LogError(ex, "Error updating Customer Details");
 
-            command.Parameters.AddWithValue("@CustomerId", requestDto.CustomerId);
-            command.Parameters.AddWithValue("@FirstName",requestDto.FirstName );
-            command.Parameters.AddWithValue("@LastName", requestDto.LastName);
-            command.Parameters.AddWithValue("@Email", requestDto.Email);
-            command.Parameters.AddWithValue("@RegistrationDate", requestDto.RegistrationDate);
-            command.Parameters.AddWithValue("@PhoneNumber", requestDto.PhoneNumber);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred.");
+            }
 
-
-            connection.Open();
-            command.ExecuteNonQuery();
-
-
-            connection.Close();
-            return Ok();
         }
-        [HttpDelete]
-        public IActionResult DeleteCustomerData(int CustomerId)
+
+        [HttpDelete("{customerId}")]
+        public async Task<IActionResult> DeleteCustomerData(int CustomerId)
         {
-            SqlConnection connection = new SqlConnection
+            try
             {
+                var customerDetail = await _context.CustomerDetails.FindAsync(CustomerId);
+                if (customerDetail == null)
+                {
+                    return NotFound();
+                }
+                _context.CustomerDetails.Remove(customerDetail);
+                await _context.SaveChangesAsync();
 
-                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
+                _cache.Remove("CustomerData");
 
-            };
-            SqlCommand command = new SqlCommand
+                return Ok();
+            }
+            catch (Exception ex)
             {
-                CommandText = "sp_DeleteCustomerDetails",
-                CommandType = System.Data.CommandType.StoredProcedure,
-                Connection = connection
-            };
+                _logger.LogError(ex, "Error Deleting Customer Details");
 
-            command.Parameters.AddWithValue("@CustomerId", CustomerId);
-
-            connection.Open();
-            command.ExecuteNonQuery();
-
-
-            connection.Close();
-            return Ok();
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred.");
+            }
         }
     }
 }

@@ -32,6 +32,7 @@ export class InventoryComponent {
   }
 
   onSubmit() {
+    
     const apiUrl = "https://localhost:7270/api/Inventory";
     let httpOptions = {
       headers: new HttpHeaders({
@@ -43,7 +44,7 @@ export class InventoryComponent {
     if (this.disableProductIDInput) {
       this.http.put(apiUrl, this.inventoryData, httpOptions).subscribe({
         next: (data) => {
-          console.log('POST request successful', data);
+          console.log('PUT request successful', data);
         },
         error: (error) => {
           console.error('There was an error!', error);
@@ -77,7 +78,6 @@ export class InventoryComponent {
     const apiUrl = "https://localhost:7270/api/Inventory";
 
     this.http.get(apiUrl).subscribe(data => {
-
       this.inventoryList = data;
     });
     this.inventoryData = {
@@ -100,7 +100,7 @@ export class InventoryComponent {
     });
   }
   DeleteItem() {
-    const apiUrl = `https://localhost:7270/api/Inventory?ProductId=${this.productIDToDelete}`;
+    const apiUrl = `https://localhost:7270/api/Inventory/${this.productIDToDelete}`;
     let httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -112,10 +112,10 @@ export class InventoryComponent {
     })
   }
   populateFormForEdit(item: any) {
-    this.inventoryData.productID = item.ProductId;
-    this.inventoryData.productName = item.ProductName;
-    this.inventoryData.avaliableStock = item.AvaliableStock;
-    this.inventoryData.reorderPoint = item.ReorderPoint;
+    this.inventoryData.productID = item.productId;
+    this.inventoryData.productName = item.productName;
+    this.inventoryData.avaliableStock = item.avaliableStock;
+    this.inventoryData.reorderPoint = item.reorderPoint;
 
     this.disableProductIDInput = true;
   }

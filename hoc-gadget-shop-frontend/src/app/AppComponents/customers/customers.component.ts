@@ -43,7 +43,6 @@ GetCustomers() {
   let apiUrl = "https://localhost:7270/api/CustomerDetails";
   this.http.get(apiUrl).subscribe({
     next: (data) => {
-      console.log('GET request successful', data);
       this.customersList = data;
     }
   });
@@ -56,8 +55,7 @@ OpenConfirmDialog(customerId:number) {
 });
 }
   DeleteCustomer(customerId: number) {
-    console.log('Deleting customer with ID:', customerId);
-    let apiUrl = `https://localhost:7270/api/CustomerDetails?CustomerId=${customerId}`;
+    let apiUrl = `https://localhost:7270/api/CustomerDetails/${customerId}`;
     this.http.delete(apiUrl).subscribe({
       next: (data) => {
 

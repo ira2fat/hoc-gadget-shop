@@ -1,8 +1,10 @@
 ﻿
+using HOCGadgetShopApi.Data;
 using HOCGadgetShopApi.Models;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using System.Data;
 
 
 namespace HOCGadgetShopApi.Controllers
@@ -12,125 +14,150 @@ namespace HOCGadgetShopApi.Controllers
     [Route("api/[controller]")]
     public class InventoryController : Controller
     {
-        [HttpPost]
-        public IActionResult SaveInventoryData(InventoryRequestDto requestDto)
+
+        readonly ILogger<InventoryController> _logger;
+        private readonly GadgetShopContext _context;
+        private readonly IMemoryCache _cache;
+
+
+        public InventoryController( ILogger<InventoryController> logger, GadgetShopContext context, IMemoryCache cache)
         {
-            SqlConnection connection = new SqlConnection
+            _logger = logger;
+            _context = context;
+            _cache = cache;
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveInventoryData([FromBody] InventoryRequestDto requestDto)
+        {
+            
+
+            try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
+                var inventory = new Inventory
+                {
+                    ProductId = requestDto.ProductId,
+                    ProductName = requestDto.ProductName,
+                    AvaliableStock = requestDto.AvaliableStock,
+                    ReorderPoint = requestDto.ReorderPoint
+                };
+                await _context.Inventories.AddAsync(inventory);
+                await _context.SaveChangesAsync();
 
-            };
-            SqlCommand command = new SqlCommand { 
-            CommandText= "sp_SaveInventoryData ",
-            CommandType= System.Data.CommandType.StoredProcedure,
-            Connection= connection
-            };
+                _cache.Remove("InventoryData");
 
-            command.Parameters.AddWithValue("@ProductId", requestDto.ProductId);
-            command.Parameters.AddWithValue("@ProductName", requestDto.ProductName);
-            command.Parameters.AddWithValue("@AvaliableStock", requestDto.AvaliableStock);
-            command.Parameters.AddWithValue("@ReorderPoint", requestDto.ReorderPoint);
+                return CreatedAtAction(nameof(GetInventoryData), new { id = requestDto.ProductId }, requestDto);
 
-            connection.Open();
-            command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error saving customer data");
 
-            connection.Close();
-            return Ok();
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred.");
+            }
+
+      
         }
 
         [HttpGet]
-        public IActionResult GetInventoryData()
+        public async Task <IActionResult> GetInventoryData()
         {
-            SqlConnection connection = new SqlConnection
+
+
+            try
             {
-
-                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
-
-            };
-            SqlCommand command = new SqlCommand
-            {
-                CommandText = "sp_GetInventoryData ",
-                CommandType = System.Data.CommandType.StoredProcedure,
-                Connection = connection
-            };
-
-            connection.Open();
-
-            List<InventoryDto> response = new List<InventoryDto>();
-
-            using (SqlDataReader reader = command.ExecuteReader()) { 
-            
-            while (reader.Read())
+                const string cacheKey = "InventoryData";
+                if (!_cache.TryGetValue(cacheKey, out List<Inventory> cachedInventory))
                 {
+                    // Data not in cache, fetch from database
+                    cachedInventory = await _context.Inventories.ToListAsync();
 
-                    InventoryDto inventoryDto = new InventoryDto();
+                    // Set cache options
+                    var cacheOptions = new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5), // Cache expires in 5 minutes
+                        SlidingExpiration = TimeSpan.FromMinutes(2) // Reset expiration if accessed within 2 minutes
+                    };
 
-                    inventoryDto.ProductId = Convert.ToInt32(reader["ProductId"]);
-                    inventoryDto.ProductName = Convert.ToString(reader["ProductName"]);
-                    inventoryDto.AvaliableStock = Convert.ToInt32(reader["AvaliableStock"]);
-                    inventoryDto.ReorderPoint = Convert.ToInt32(reader["ReorderPoint"]);
-                    response.Add(inventoryDto);
+                    // Store data in cache
+                    _cache.Set(cacheKey, cachedInventory, cacheOptions);
                 }
+
+                return Ok(cachedInventory);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching inventory data");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred.");
             }
 
-            connection.Close();
-            return Ok(JsonConvert.SerializeObject(value: response));
+            
         }
 
-        [HttpDelete]
-        public IActionResult DeleteInventoryData(int ProductId)
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> DeleteInventoryData(int productId)
         {
-            SqlConnection connection = new SqlConnection
+            try
             {
+                var inventory = await _context.Inventories.FindAsync(productId);
+                if (inventory == null)
+                {
+                    return NotFound();
+                }
 
-                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
+                _context.Inventories.Remove(inventory);
+                await _context.SaveChangesAsync();
 
-            };
-            SqlCommand command = new SqlCommand
+                _cache.Remove("InventoryData");
+
+                return Ok();
+            }
+            catch (Exception ex)
             {
-                CommandText = "SP_DeleteInventoryDetails",
-                CommandType = System.Data.CommandType.StoredProcedure,
-                Connection = connection
-            };
-
-            command.Parameters.AddWithValue("@ProductId", ProductId);
-
-            connection.Open();
-            command.ExecuteNonQuery();
-
-
-            connection.Close();
-            return Ok();
+                _logger.LogError(ex, "Error deleting inventory data");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred.");
+            }
         }
 
         [HttpPut]
-        public IActionResult UpdateInventoryData(InventoryRequestDto requestDto)
+        public async Task<IActionResult> UpdateInventoryData([FromBody] InventoryRequestDto requestDto)
         {
-            SqlConnection connection = new SqlConnection
+            
+            try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
+                var inventory = await _context.Inventories.FindAsync(requestDto.ProductId);
+                if (inventory == null)
+                {
+                    return NotFound();
+                }
 
-            };
-            SqlCommand command = new SqlCommand
+                inventory.ProductName = requestDto.ProductName;
+                inventory.AvaliableStock = requestDto.AvaliableStock;
+                inventory.ReorderPoint = requestDto.ReorderPoint;
+
+                _context.Inventories.Update(inventory);
+                await _context.SaveChangesAsync();
+
+                _cache.Remove("InventoryData");
+
+                return Ok();
+            }
+            catch (Exception ex)
             {
-                CommandText = "sp_UpdateInventoryData",
-                CommandType = System.Data.CommandType.StoredProcedure,
-                Connection = connection
-            };
-
-            command.Parameters.AddWithValue("@ProductId", requestDto.ProductId);
-            command.Parameters.AddWithValue("@ProductName", requestDto.ProductName);
-            command.Parameters.AddWithValue("@AvaliableStock", requestDto.AvaliableStock);
-            command.Parameters.AddWithValue("@ReorderPoint", requestDto.ReorderPoint);
-
-            connection.Open();
-            command.ExecuteNonQuery();
-
-
-            connection.Close();
-            return Ok();
+                _logger.LogError(ex, "Error updating inventory data");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred.");
+            }
         }
     }
 }

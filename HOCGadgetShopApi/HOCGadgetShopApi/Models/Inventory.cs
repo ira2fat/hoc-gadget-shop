@@ -1,16 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HOCGadgetShopApi.Models
 {
-    public class InventoryRequestDto
+    [Table("Inventory")]
+    public class Inventory
     {
-        #region Properties
-        [Required]
+        [Key]
         public int ProductId { get; set; }
         public string ProductName { get; set; }
         public int AvaliableStock { get; set; }
         public int ReorderPoint { get; set; }
-
-        #endregion
     }
 }

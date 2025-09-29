@@ -17,15 +17,15 @@
         </thead>
         <tbody>
             <tr *ngFor="let customer of customersList">
-                <td>{{ customer.CustomerId }}</td>
-                <td>{{ customer.FirstName }}</td>
-                <td>{{ customer.LastName }}</td>
-                <td>{{ customer.Email }}</td>
-                <td>{{ customer.PhoneNumber }}</td>
-                <td>{{ customer.RegistrationDate }}</td>
+                <td>{{ customer.customerId }}</td>
+                <td>{{ customer.firstName }}</td>
+                <td>{{ customer.lastName }}</td>
+                <td>{{ customer.email }}</td>
+                <td>{{ customer.phoneNumber }}</td>
+                <td>{{ customer.registrationDate }}</td>
                 <td>
                     <button class="btn btn-sm btn-primary me-2" (click)="openCustomerDialog(customer)">Edit</button>
-                    <button class="btn btn-sm btn-danger" (click)="OpenConfirmDialog(customer.CustomerId )">Delete</button>
+                    <button class="btn btn-sm btn-danger" (click)="OpenConfirmDialog(customer.customerId)">Delete</button>
                 </td>
             </tr>
         </tbody>
