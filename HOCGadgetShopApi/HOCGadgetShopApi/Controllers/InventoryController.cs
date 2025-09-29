@@ -103,6 +103,7 @@ namespace HOCGadgetShopApi.Controllers
             connection.Close();
             return Ok();
         }
+
         [HttpPut]
         public IActionResult UpdateInventoryData(InventoryRequestDto requestDto)
         {

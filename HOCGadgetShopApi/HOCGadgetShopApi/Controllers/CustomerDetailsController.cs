@@ -74,13 +74,69 @@ namespace HOCGadgetShopApi.Controllers
                     customerDto.LastName = Convert.ToString(reader["LastName"]);
                     customerDto.Email = Convert.ToString(reader["Email"]);
                     customerDto.PhoneNumber = Convert.ToString(reader["PhoneNumber"]);
-                    customerDto.RegistrationDate = Convert.ToDateTime(reader["RegistrationDate"]);
+                    customerDto.RegistrationDate = Convert.ToString(reader["RegistrationDate"]);
                     response.Add(customerDto);
                 }
             }
 
             connection.Close();
             return Ok(JsonConvert.SerializeObject(value: response));
+        }
+        [HttpPut]
+        public IActionResult UpdateCustomerData(CustomerRequestDto requestDto)
+        {
+            SqlConnection connection = new SqlConnection
+            {
+
+                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
+
+            };
+            SqlCommand command = new SqlCommand
+            {
+                CommandText = "sp_UpdateCustomerDetails",
+                CommandType = System.Data.CommandType.StoredProcedure,
+                Connection = connection
+            };
+
+            command.Parameters.AddWithValue("@CustomerId", requestDto.CustomerId);
+            command.Parameters.AddWithValue("@FirstName",requestDto.FirstName );
+            command.Parameters.AddWithValue("@LastName", requestDto.LastName);
+            command.Parameters.AddWithValue("@Email", requestDto.Email);
+            command.Parameters.AddWithValue("@RegistrationDate", requestDto.RegistrationDate);
+            command.Parameters.AddWithValue("@PhoneNumber", requestDto.PhoneNumber);
+
+
+            connection.Open();
+            command.ExecuteNonQuery();
+
+
+            connection.Close();
+            return Ok();
+        }
+        [HttpDelete]
+        public IActionResult DeleteCustomerData(int CustomerId)
+        {
+            SqlConnection connection = new SqlConnection
+            {
+
+                ConnectionString = "Server=DESKTOP-N67GFHH; Database=gadgetShop; Integrated Security=true; TrustServerCertificate=True"
+
+            };
+            SqlCommand command = new SqlCommand
+            {
+                CommandText = "sp_DeleteCustomerDetails",
+                CommandType = System.Data.CommandType.StoredProcedure,
+                Connection = connection
+            };
+
+            command.Parameters.AddWithValue("@CustomerId", CustomerId);
+
+            connection.Open();
+            command.ExecuteNonQuery();
+
+
+            connection.Close();
+            return Ok();
         }
     }
 }
