@@ -1,8 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, inject, Input } from '@angular/core';
+
+import { Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { Customer } from '../../models/customer.model';
+import { CustomerService } from '../../services/customer.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-customer-dialog-box',
@@ -11,12 +14,14 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './customer-dialog-box.component.html',
   styleUrl: './customer-dialog-box.component.css'
 })
-export class CustomerDialogBoxComponent {
+export class CustomerDialogBoxComponent implements OnInit, OnDestroy {
 
-  @Input() customer?:any;
+  @Input() customer?: Customer;
 
   modal = inject(NgbActiveModal);
-  http = inject(HttpClient);
+  customerService = inject(CustomerService);
+  private destroy$ = new Subject<void>();
+
   disableProductIDInput: boolean = false;
 
   customerDetails = {
@@ -31,14 +36,20 @@ export class CustomerDialogBoxComponent {
   ngOnInit() {
     if (this.customer) {
       this.disableProductIDInput = true;
-      this.customerDetails.firstName = this.customer.FirstName;
-      this.customerDetails.lastName = this.customer.LastName;
-      this.customerDetails.email = this.customer.Email;
-      this.customerDetails.registrationDate = this.customer.RegistrationDate;
-      this.customerDetails.customerId = this.customer.CustomerId;
-      this.customerDetails.phoneNumber = this.customer.PhoneNumber;
+      this.customerDetails.firstName = this.customer.firstName;
+      this.customerDetails.lastName = this.customer.lastName;
+      this.customerDetails.email = this.customer.email;
+      this.customerDetails.registrationDate = this.customer.registrationDate;
+      this.customerDetails.customerId = String(this.customer.customerId);
+      this.customerDetails.phoneNumber = this.customer.phoneNumber;
     
     }}
+
+    ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
 
   onSubmit() {
     if (this.customer) {
@@ -50,56 +61,36 @@ export class CustomerDialogBoxComponent {
   }
 
   addCustomer() {
-    console.log('Adding customer:', this.customerDetails);
-
-    let apiUrl = "https://localhost:7270/api/CustomerDetails";
-    let httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: 'my-auth-token',
-      })
-    };
-
-    this.http.post(apiUrl, this.customerDetails, httpOptions).subscribe({
-      next: (data) => {
-        console.log('POST request successful', data);   
-      },
-      error: (error) => {
-        console.error('There was an error!', error);},
-      complete: () => {
-        this.modal.close({event:"added"});
+    this.customerService.createCustomer(this.customerDetails).pipe(takeUntil(this.destroy$)).subscribe(
+      {
+        next: (data) => {
+          console.log('POST request successful', data);   
+        },
+        error: (error) => {
+          console.error('There was an error!', error);
+        },
+        complete: () => { this.modal.close({event:"added"}); }
       }
-    });
+    );
   }
 
   editCustomer() {
-    console.log('Editing customer:', this.customerDetails);
-    let apiUrl = "https://localhost:7270/api/CustomerDetails";
-    let httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Authorization: 'my-auth-token',
-      })
-    };
-  this.http.put(apiUrl, this.customerDetails, httpOptions).subscribe({
-    next: (data) => {
-      console.log('PUT request successful', data);   
-    },
-    error: (error) => {
-      console.error('There was an error!', error);},
-    complete: () => {
-      this.modal.close({event:"added"});
-      this.disableProductIDInput = false;
-      this.customerDetails = {
-        firstName: "",
-        lastName: "",
-        email: "",
-        registrationDate: "",
-        customerId: "",
-        phoneNumber: ""
-      };
-    }
-  })
+
+    this.customerService.updateCustomer(this.customerDetails).pipe(takeUntil(this.destroy$)).subscribe({
+      error: (error) => { console.error('There was an error!', error); },
+      complete: () =>{
+        this.modal.close({event:"added"});
+        this.disableProductIDInput = false;
+        this.customerDetails = {
+          firstName: "",
+          lastName: "",
+          email: "",
+          registrationDate: "",
+          customerId: "",
+          phoneNumber: ""
+        };
+      }
+    })
   }
     
 }

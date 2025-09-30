@@ -130,11 +130,11 @@ namespace HOCGadgetShopApi.Controllers
         }
 
         [HttpDelete("{customerId}")]
-        public async Task<IActionResult> DeleteCustomerData(int CustomerId)
+        public async Task<IActionResult> DeleteCustomerData(int customerId)
         {
             try
             {
-                var customerDetail = await _context.CustomerDetails.FindAsync(CustomerId);
+                var customerDetail = await _context.CustomerDetails.FindAsync(customerId);
                 if (customerDetail == null)
                 {
                     return NotFound();

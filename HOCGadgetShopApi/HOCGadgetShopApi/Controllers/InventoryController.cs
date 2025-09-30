@@ -44,7 +44,7 @@ namespace HOCGadgetShopApi.Controllers
                 {
                     ProductId = requestDto.ProductId,
                     ProductName = requestDto.ProductName,
-                    AvaliableStock = requestDto.AvaliableStock,
+                    AvailableStock = requestDto.AvailableStock,
                     ReorderPoint = requestDto.ReorderPoint
                 };
                 await _context.Inventories.AddAsync(inventory);
@@ -143,7 +143,7 @@ namespace HOCGadgetShopApi.Controllers
                 }
 
                 inventory.ProductName = requestDto.ProductName;
-                inventory.AvaliableStock = requestDto.AvaliableStock;
+                inventory.AvailableStock = requestDto.AvailableStock;
                 inventory.ReorderPoint = requestDto.ReorderPoint;
 
                 _context.Inventories.Update(inventory);

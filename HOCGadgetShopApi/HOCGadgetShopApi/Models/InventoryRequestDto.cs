@@ -8,7 +8,7 @@ namespace HOCGadgetShopApi.Models
         [Required]
         public int ProductId { get; set; }
         public string ProductName { get; set; }
-        public int AvaliableStock { get; set; }
+        public int AvailableStock { get; set; }
         public int ReorderPoint { get; set; }
 
         #endregion

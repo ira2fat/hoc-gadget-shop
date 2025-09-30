@@ -1,9 +1,12 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CustomerDialogBoxComponent } from '../customer-dialog-box/customer-dialog-box.component';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { DialogBoxComponent } from '../dialog-box/dialog-box.component';
+import { Customer } from '../../models/customer.model';
+import { CustomerService } from '../../services/customer.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-customers',
@@ -12,41 +15,37 @@ import { DialogBoxComponent } from '../dialog-box/dialog-box.component';
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.css'
 })
-export class CustomersComponent {
+export class CustomersComponent implements OnInit, OnDestroy {
 
   private modalService= inject(NgbModal);
+  private customerService = inject(CustomerService);
+  private destroy$ = new Subject<void>();
+
   http = inject(HttpClient);
-  customersList:any;
+  customersList: Customer[] = [];
 
   ngOnInit() {
 
-    this.GetCustomers();
+    this.getCustomers();
   }
-openCustomerDialog(customer?:any) {
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+
+openCustomerDialog(customer?:Customer) {
 const modalRef = this.modalService.open(CustomerDialogBoxComponent);
-  if (customer) {
-    
+  if (customer) {   
     modalRef.componentInstance.customer = customer;
-    modalRef.result.then((result) => {
-      if (result.event === 'added') {
-        this.GetCustomers();
-      }
-    });
   }
   modalRef.result.then((result) => {
   if (result.event === 'added') {
-    this.GetCustomers();
+    this.getCustomers();
   }})
 }
 
-GetCustomers() {
-  let apiUrl = "https://localhost:7270/api/CustomerDetails";
-  this.http.get(apiUrl).subscribe({
-    next: (data) => {
-      this.customersList = data;
-    }
-  });
-}
 OpenConfirmDialog(customerId:number) {
   const modalRef = this.modalService.open(DialogBoxComponent);
   modalRef.result.then((result) => {
@@ -54,18 +53,22 @@ OpenConfirmDialog(customerId:number) {
       this.DeleteCustomer(customerId);    }
 });
 }
-  DeleteCustomer(customerId: number) {
-    let apiUrl = `https://localhost:7270/api/CustomerDetails/${customerId}`;
-    this.http.delete(apiUrl).subscribe({
-      next: (data) => {
 
-      },
-      error: (error) => {
-        console.error('There was an error!', error);
-      },
-      complete: () => {
-        this.GetCustomers();
-      }
+private getCustomers() {
+  this.customerService.getAllCustomers().pipe(takeUntil(this.destroy$)).subscribe({
+    next:(customer:Customer[])=> {
+      this.customersList = customer;
+    },
+    error: (error) => {
+      console.error('Error loading customers:', error);
+    }
   })
+}
+
+  DeleteCustomer(customerId: number) {
+    this.customerService.deleteCustomer(customerId).pipe(takeUntil(this.destroy$)).subscribe({
+      error: (error) => { console.error('There was an error!', error); },
+      complete: () => this.getCustomers()
+    });
 }
 }
