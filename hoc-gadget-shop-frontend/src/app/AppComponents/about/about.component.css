@@ -1,0 +1,60 @@
+/* About Component Styles */
+
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 0;
+  margin: -1.5rem -15px 0 -15px;
+  border-radius: 0 0 30px 30px;
+}
+
+.hero-section h1 {
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.display-1 {
+  font-size: 3rem;
+}
+
+.text-primary {
+  color: #667eea !important;
+}
+
+.bg-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Team member avatars */
+.rounded-circle {
+  font-weight: bold;
+  font-size: 1.5rem !important;
+}
+
+/* Statistics cards animation */
+.card-body {
+  padding: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 0;
+  }
+  
+  .display-4 {
+    font-size: 2.5rem;
+  }
+  
+  .display-1 {
+    font-size: 2rem;
+  }
+}

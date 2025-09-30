@@ -1,0 +1,126 @@
+<div class="container mt-4">
+  <!-- Hero Section -->
+  <div class="hero-section text-center mb-5">
+    <h1 class="display-4 fw-bold text-primary mb-3">About Online Shop</h1>
+    <p class="lead text-muted">Your trusted partner for quality products and exceptional service</p>
+  </div>
+
+  <!-- Mission Section -->
+  <div class="row mb-5">
+    <div class="col-lg-8 mx-auto">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body text-center p-5">
+          <h2 class="h3 mb-4">Our Mission</h2>
+          <p class="lead">{{ mission }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <h2 class="text-center mb-4">Our Impact</h2>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4" *ngFor="let stat of stats">
+      <div class="card text-center h-100 border-0 shadow-sm">
+        <div class="card-body">
+          <div class="display-1 mb-3">{{ stat.icon }}</div>
+          <h3 class="h4 text-primary">{{ stat.value }}</h3>
+          <p class="text-muted">{{ stat.label }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Values Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <h2 class="text-center mb-5">Our Core Values</h2>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4" *ngFor="let value of values">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body text-center">
+          <div class="display-4 mb-3">{{ value.icon }}</div>
+          <h4 class="card-title">{{ value.title }}</h4>
+          <p class="card-text text-muted">{{ value.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <h2 class="text-center mb-5">Meet Our Team</h2>
+    </div>
+    <div class="col-lg-4 col-md-6 mb-4" *ngFor="let member of teamMembers">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-body text-center">
+          <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" 
+               style="width: 80px; height: 80px; font-size: 2rem;">
+            {{ member.name.charAt(0) }}
+          </div>
+          <h5 class="card-title">{{ member.name }}</h5>
+          <p class="text-primary fw-semibold">{{ member.position }}</p>
+          <p class="text-muted small">{{ member.experience }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Company Info Section -->
+  <div class="row mb-5">
+    <div class="col-lg-8 mx-auto">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-5">
+          <h2 class="text-center mb-4">Our Story</h2>
+          <p class="text-muted mb-4">
+            Founded in {{ foundedYear }}, {{ companyName }} has been dedicated to bringing you the best 
+            products at competitive prices. What started as a small venture has grown into a trusted 
+            e-commerce platform serving customers worldwide.
+          </p>
+          <p class="text-muted mb-4">
+            We believe in the power of technology to connect people with the products they love. 
+            Our team works tirelessly to ensure every customer has an exceptional shopping experience, 
+            from browsing our curated selection to receiving their order at their doorstep.
+          </p>
+          <div class="row text-center mt-4">
+            <div class="col-md-4">
+              <h4 class="text-primary">{{ foundedYear }}</h4>
+              <p class="text-muted">Year Founded</p>
+            </div>
+            <div class="col-md-4">
+              <h4 class="text-primary">50,000+</h4>
+              <p class="text-muted">Happy Customers</p>
+            </div>
+            <div class="col-md-4">
+              <h4 class="text-primary">25+</h4>
+              <p class="text-muted">Countries Served</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact CTA Section -->
+  <div class="row mb-5">
+    <div class="col-lg-8 mx-auto text-center">
+      <div class="card bg-primary text-white border-0 shadow">
+        <div class="card-body p-5">
+          <h2 class="mb-3">Ready to Start Shopping?</h2>
+          <p class="mb-4">Discover our amazing collection of products and experience the Online Shop difference.</p>
+          <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <button class="btn btn-light btn-lg" routerLink="/inventory">
+              <i class="bi bi-box-seam me-2"></i>View Products
+            </button>
+            <button class="btn btn-outline-light btn-lg">
+              <i class="bi bi-envelope me-2"></i>Contact Us
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
