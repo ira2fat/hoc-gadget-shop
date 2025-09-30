@@ -1,13 +1,13 @@
-﻿using HOCGadgetShopApi.Models;
+﻿using OnlineShopApi.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Data;
-using HOCGadgetShopApi.Data;
+using OnlineShopApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace HOCGadgetShopApi.Controllers
+namespace OnlineShopApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -16,11 +16,11 @@ namespace HOCGadgetShopApi.Controllers
     {
   
         private readonly ILogger<CustomerDetailsController> _logger;
-        private readonly GadgetShopContext _context;
+        private readonly OnlineShopContext _context;
         private readonly IMemoryCache _cache;
 
 
-        public CustomerDetailsController(IConfiguration configuration, ILogger<CustomerDetailsController> logger, GadgetShopContext context, IMemoryCache cache)
+        public CustomerDetailsController(IConfiguration configuration, ILogger<CustomerDetailsController> logger, OnlineShopContext context, IMemoryCache cache)
         {
             _logger = logger;
             _context = context;

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HOCGadgetShopApi.Models
+namespace OnlineShopApi.Models
 {
     public class CustomerRequestDto
     {

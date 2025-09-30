@@ -1,12 +1,12 @@
-﻿using HOCGadgetShopApi.Models;
+﻿using OnlineShopApi.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace HOCGadgetShopApi.Data
+namespace OnlineShopApi.Data
 {
-    public class GadgetShopContext : DbContext
+    public class OnlineShopContext : DbContext
     {
 
-        public GadgetShopContext(DbContextOptions<GadgetShopContext> options) : base(options)
+        public OnlineShopContext(DbContextOptions<OnlineShopContext> options) : base(options)
         {
         }
 

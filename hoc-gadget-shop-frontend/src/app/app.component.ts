@@ -10,5 +10,5 @@ import { RouterOutlet, RouterModule, RouterLink } from '@angular/router';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'hoc-gadget-shop-frontend';
+  title = 'online-shop-frontend';
 }

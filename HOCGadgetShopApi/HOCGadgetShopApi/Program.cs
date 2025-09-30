@@ -1,4 +1,4 @@
-using HOCGadgetShopApi.Data;
+using OnlineShopApi.Data;
 using Microsoft.EntityFrameworkCore;
 
 var myAllowedOrigins = "_myAllowedOrigins";
@@ -13,7 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
 
-builder.Services.AddDbContext<GadgetShopContext>(options =>
+builder.Services.AddDbContext<OnlineShopContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
                       policy =>
                       {
                           policy.WithOrigins("http://localhost:4200",
-                                              "https://hocgadgetshop.vercel.app", "http://localhost")
+                                              "https://onlineshop.vercel.app", "http://localhost")
                                 .AllowAnyHeader()
                                 .AllowAnyMethod().SetIsOriginAllowedToAllowWildcardSubdomains();
                       });

@@ -1,4 +1,4 @@
-﻿namespace HOCGadgetShopApi.Models
+﻿namespace OnlineShopApi.Models
 {
     public class InventoryDto
     {

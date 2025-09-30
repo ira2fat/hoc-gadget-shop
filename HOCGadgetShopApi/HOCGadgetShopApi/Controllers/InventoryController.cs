@@ -1,13 +1,13 @@
 ﻿
-using HOCGadgetShopApi.Data;
-using HOCGadgetShopApi.Models;
+using OnlineShopApi.Data;
+using OnlineShopApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 
 
-namespace HOCGadgetShopApi.Controllers
+namespace OnlineShopApi.Controllers
 {
 
     [ApiController]
@@ -16,11 +16,11 @@ namespace HOCGadgetShopApi.Controllers
     {
 
         readonly ILogger<InventoryController> _logger;
-        private readonly GadgetShopContext _context;
+        private readonly OnlineShopContext _context;
         private readonly IMemoryCache _cache;
 
 
-        public InventoryController( ILogger<InventoryController> logger, GadgetShopContext context, IMemoryCache cache)
+        public InventoryController( ILogger<InventoryController> logger, OnlineShopContext context, IMemoryCache cache)
         {
             _logger = logger;
             _context = context;

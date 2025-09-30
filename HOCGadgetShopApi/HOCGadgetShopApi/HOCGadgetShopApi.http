@@ -1,6 +1,6 @@
-@HOCGadgetShopApi_HostAddress = http://localhost:5155
+@OnlineShopApi_HostAddress = http://localhost:5155
 
-GET {{HOCGadgetShopApi_HostAddress}}/weatherforecast/
+GET {{OnlineShopApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###

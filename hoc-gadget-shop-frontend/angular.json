@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "hoc-gadget-shop-frontend": {
+    "online-shop-frontend": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/hoc-gadget-shop-frontend",
+            "outputPath": "dist/online-shop-frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -61,10 +61,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "hoc-gadget-shop-frontend:build:production"
+              "buildTarget": "online-shop-frontend:build:production"
             },
             "development": {
-              "buildTarget": "hoc-gadget-shop-frontend:build:development"
+              "buildTarget": "online-shop-frontend:build:development"
             }
           },
           "defaultConfiguration": "development"

@@ -1,4 +1,4 @@
-namespace HOCGadgetShopApi
+namespace OnlineShopApi
 {
     public class WeatherForecast
     {

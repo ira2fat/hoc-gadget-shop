@@ -1,51 +1,75 @@
 <div class="container mt-4">
   <h3>Inventory</h3>
 
-  <form class="row g-3 align-items-center mb-4" (ngSubmit)="onSubmit()" novalidate>
+  <form [formGroup]="inventoryForm" class="row g-3 align-items-start mb-4" (ngSubmit)="onSubmit()" novalidate>
     <div class="col-md-2">
       <input
         type="text"
         class="form-control"
+        [class.is-invalid]="hasFieldError('productID')"
         placeholder="Product Id"
-        disabled={{disableProductIDInput}}
-        name="productId" [(ngModel)]="inventoryData.productID"
+        formControlName="productID"
       />
+      <div class="invalid-feedback" *ngIf="hasFieldError('productID')">
+        {{ getFieldError('productID') }}
+      </div>
     </div>
 
     <div class="col-md-3">
-      <select
-        class="form-select"
-        name="productName" [(ngModel)]="inventoryData.productName"
-      >
-        <option value="">Choose...</option>
-        <option value="Earphones">Earphones</option>
-        <option value="Mobile">Mobile</option>
-        <option value="Playstation">Playstation</option>
-      </select>
-    </div>
-
-    <div class="col-md-2">
       <input
-        type="number"
+        type="text"
         class="form-control"
-        placeholder="Stock"
-        name="stock"
-        [(ngModel)]="inventoryData.availableStock"
+        [class.is-invalid]="hasFieldError('productName')"
+        placeholder="Product Name"
+        formControlName="productName"
       />
+      <div class="invalid-feedback" *ngIf="hasFieldError('productName')">
+        {{ getFieldError('productName') }}
+      </div>
     </div>
 
     <div class="col-md-2">
       <input
         type="number"
         class="form-control"
+        [class.is-invalid]="hasFieldError('availableStock')"
+        placeholder="Available Stock"
+        formControlName="availableStock"
+      />
+      <div class="invalid-feedback" *ngIf="hasFieldError('availableStock')">
+        {{ getFieldError('availableStock') }}
+      </div>
+    </div>
+
+    <div class="col-md-2">
+      <input
+        type="number"
+        class="form-control"
+        [class.is-invalid]="hasFieldError('reorderPoint')"
         placeholder="Reorder Point"
-        name="reorderPoint"
-        [(ngModel)]="inventoryData.reorderPoint"
+        formControlName="reorderPoint"
       />
+      <div class="invalid-feedback" *ngIf="hasFieldError('reorderPoint')">
+        {{ getFieldError('reorderPoint') }}
+      </div>
     </div>
 
     <div class="col-md-2">
-      <button type="submit" class="btn btn-primary w-100">Submit</button>
+      <button 
+        type="submit" 
+        class="btn w-100"
+        [class.btn-warning]="isEditMode"
+        [class.btn-primary]="!isEditMode"
+        [disabled]="inventoryForm.invalid">
+        {{ isEditMode ? 'Update' : 'Add' }}
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-secondary w-100 mt-2" 
+        *ngIf="isEditMode"
+        (click)="resetForm()">
+        Cancel
+      </button>
     </div>
   </form>
 

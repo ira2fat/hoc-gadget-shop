@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HOCGadgetShopApi.Models
+namespace OnlineShopApi.Models
 {
     [Table("CustomerDetails")]
     public class CustomerDetails
